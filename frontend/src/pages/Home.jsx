@@ -1,4 +1,5 @@
 import { Send } from "lucide-react";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -22,8 +23,8 @@ function Home() {
       </div>
 
       {/* Buttons */}
-      <button className="btn btn-lg btn-wide m-5">Create Shadow</button>
-      <button className="btn btn-lg btn-wide m-5">Join Shadow</button>
+      <Link to={'/create'} className="btn btn-lg btn-wide m-5">Create Shadow</Link>
+      <Link to={'/join'} className="btn btn-lg btn-wide m-5">Join Shadow</Link>
     </div>
   );
 }

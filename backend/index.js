@@ -16,7 +16,15 @@ const io = new Server(server, {
 });
 
 const rooms = {};
-const users = [];
+// rooms = {
+//   "roomA": { host: "socket789" },
+// };
+
+const users = {};
+// users = {
+//   "socket123": { name: "Alice", roomId: "roomA" },
+//   "socket456": { name: "Bob", roomId: "roomA" }
+// };
 
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'public', 'index.html'));
@@ -24,40 +32,86 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   console.log("A user connected : " + socket.id);
-  users.push(socket.id);
-  io.emit('chat-users', users);
-  console.log("connected users : ", users);
 
-  // create room
-  socket.on('createRoom', () => {
+  // SOCKET CREATE ROOM
+  socket.on('createRoom', async (name) => {
     const roomId = generateRoomId();
     socket.join(roomId);
-    rooms[roomId].push(socket.id);
-    console.log("rooms : "+rooms)
+
+    // add to rooms data structure
+    rooms[roomId] = {host: socket.id};
+    // add to users data structure
+    users[socket.id] = {name, roomId};
+    const sockets = await io.in(roomId).fetchSockets();
+    const remainingSockets = []
+    sockets.forEach((socket)=>{
+      remainingSockets.push(socket.id);
+    });
+    console.log(remainingSockets);
+    io.to(roomId).emit('roomInfo', {roomId, users: remainingSockets, usersLength: remainingSockets.length});
+    console.log("rooms : "+ Object.keys(rooms));
   })
 
-  socket.on('joinRoom', async (roomId) => {
-    const sockets = await io.in(roomId).fetchSockets();
-    if (!Object.keys(rooms).includes(roomId)) {
-      socket.emit("error", "There is so such active room");
+  // SOCKET JOIN ROOM
+  socket.on('joinRoom', async ({roomId, name}) => {
+    if(!name) {
+      socket.emit("error", {message: "name not found", errorCode: "NAME_NOT_FOUND"});
+      return;
+    }
+    if (!io.sockets.adapter.rooms.has(roomId)) {
+      socket.emit("error", {message: "There is so such active room", errorCode: "ROOM_NOT_FOUND"});
       return;
     }
     socket.join(roomId);
-  });
-  socket.on('messageRoom', async (roomId, message)=>{
+    users[socket.id] = {name, roomId};
+    // update all the users that a person has joined
     const sockets = await io.in(roomId).fetchSockets();
-    if (!Object.keys(rooms).includes(roomId)) {
-      socket.emit("error", "There is so such active room");
+    const updatedSockets = []
+    sockets.forEach((socket)=>{
+      updatedSockets.push(socket.id);
+    });
+    console.log("users in room : "+updatedSockets);
+    console.log("count of users in room : "+updatedSockets.length);
+    io.to(roomId).emit('roomInfo', {roomId, users: updatedSockets, usersLength: updatedSockets.length});
+  });
+
+  // SOCKET MESSAGE
+  socket.on('chatMessage', async (msgObj)=>{
+    if(!io.sockets.adapter.rooms.has(msgObj.roomId)){
+      // if the room does not exists
+      socket.emit("error", {message: "No such room not found!", errorCode: "ROOM_NOT_FOUND"});
       return;
     }
-    sockets.emit('messageRoom', message);
+    console.log("message recieved and forwarded!");
+    io.to(msgObj.roomId).emit("chatMessage", msgObj); 
   })
+
+  // SOCKET DISCONNECT
   socket.on('disconnect', async () => {
-    console.log(socket.rooms);
-    users.splice(users.indexOf(socket.id), 1);
-    io.emit('chat-users', users);
-    console.log("connected users : ", users);
-    console.log('user disconnected : ' + socket.id);
+    try {
+      console.log('user disconnected : ' + socket.id);
+      // if user is not saved in data structure
+      if(!users[socket.id]) return;
+      const {roomId} = users[socket.id];
+      delete users[socket.id];
+      if(io.sockets.adapter.rooms.has(roomId)){
+        // if there is a room update all the users that a person has left
+        const sockets = await io.in(roomId).fetchSockets();
+        const remainingSockets = []
+        sockets.forEach((socket1)=>{
+          remainingSockets.push(socket1.id);
+        });
+        io.to(roomId).emit('roomInfo', {roomId, users: remainingSockets, usersLength: remainingSockets.length});
+      }
+      else{
+        console.log("room has been deleted : ", roomId);
+        // if the room does not exists
+        delete rooms[roomId];
+        console.log('rooms left : ' + Object.keys(rooms));
+      }
+    } catch (error) {
+      console.log("Internal Server Error : "+ error.message);
+    }
   });
 });
 

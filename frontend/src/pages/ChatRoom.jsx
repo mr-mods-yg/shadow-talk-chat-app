@@ -21,17 +21,21 @@ function ChatRoom() {
   const params = useParams();
 
   useEffect(() => {
-    if(name.trim()=="") return navigate('/');
     socket.connect();
-    socket.on('connect', () => {
-      console.log("server connected!")
-    })
     if(!params.roomId) {
       // ROOMS NOT FOUND IN PARAMS -> CREATE ROOM
+      if(name.trim()=="") {
+        toast.error("please enter your name!");
+        return navigate('/create')
+      };
       socket.emit('createRoom', name);
     }
     else{
       // ROOM FOUND IN PARAMS -> JOIN ROOM
+      if(name.trim()=="") {
+        toast.error("please enter your name to join a room!");
+        return navigate('/join')
+      };
       socket.emit('joinRoom', {roomId: params.roomId, name});
       setRoomId(params.roomId);
     }

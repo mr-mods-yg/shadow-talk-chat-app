@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
       return;
     }
     // room exists and sent the message to everyone in the room
-    console.log("message recieved and forwarded!");
+    // console.log("message recieved and forwarded!");
     io.to(msgObj.roomId).emit("chatMessage", msgObj); 
   })
 

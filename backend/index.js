@@ -12,7 +12,8 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:5173"
-  }
+  },
+  maxHttpBufferSize: 10e6 //Allow up to 10 MB (default is 1 MB)
 });
 
 const rooms = {};
@@ -121,6 +122,7 @@ io.on('connection', (socket) => {
     }, 1000);
     
   })
+  
   // SOCKET DISCONNECT
   socket.on('disconnect', async () => {
     try {

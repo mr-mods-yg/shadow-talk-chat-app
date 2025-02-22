@@ -4,14 +4,17 @@ const { join } = require('node:path');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const { generateRoomId } = require('./libs/roomId');
-const app = express();
 
+const app = express();
+require('dotenv').config()
+
+console.log(process.env.FRONTEND_URL);
 app.use(cors());
 app.use(express.json())
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173"
+    origin: process.env.FRONTEND_URL
   },
   maxHttpBufferSize: 10e6 //Allow up to 10 MB (default is 1 MB)
 });
@@ -122,7 +125,7 @@ io.on('connection', (socket) => {
     }, 1000);
     
   })
-  
+
   // SOCKET DISCONNECT
   socket.on('disconnect', async () => {
     try {
@@ -151,7 +154,7 @@ io.on('connection', (socket) => {
     }
   });
 });
-
-server.listen(3000, () => {
-  console.log('server running at http://localhost:3000');
+const PORT = process.env.BACKEND_PORT
+server.listen(PORT, () => {
+  console.log('server running at PORT '+PORT);
 });

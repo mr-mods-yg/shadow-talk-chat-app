@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 // "undefined" means the URL will be computed from the `window.location` object
-const URL = import.meta.env.PROD === 'production' ? undefined : 'http://localhost:3000';
+const URL = import.meta.env.PROD === 'production' ? import.meta.env.BACKEND_URL : 'http://localhost:3000';
 
 export const socket = io(URL,{
     autoConnect: false,

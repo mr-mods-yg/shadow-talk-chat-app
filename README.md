@@ -10,7 +10,7 @@ Features to expect:
 
 - <strike>user avatars</strike>
 
-- sending files (images, etc.)
+- sending files (<strike>images</strike>, etc.)
 
 
 ## Demo

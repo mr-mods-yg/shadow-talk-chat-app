@@ -6,9 +6,9 @@ Features to expect:
 
 - privacy features (encryption)
 
-- chat rooms
+- <strike>chat rooms</strike>
 
-- user avatars
+- <strike>user avatars</strike>
 
 - sending files (images, etc.)
 

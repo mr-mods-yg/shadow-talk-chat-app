@@ -9,8 +9,10 @@ const app = express();
 require('dotenv').config()
 
 console.log(process.env.FRONTEND_URL);
+
 app.use(cors());
 app.use(express.json())
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {

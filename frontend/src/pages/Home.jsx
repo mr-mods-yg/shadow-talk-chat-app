@@ -25,6 +25,11 @@ function Home() {
       {/* Buttons */}
       <Link to={'/create'} className="btn btn-lg btn-wide m-5">Create Shadow</Link>
       <Link to={'/join'} className="btn btn-lg btn-wide m-5">Join Shadow</Link>
+      <footer className="fixed bottom-0 footer footer-center bg-base-300 text-base-content p-4">
+        <aside>
+          <p>Made with ❤️ by <a href="https://github.com/mr-mods-yg/shadow-talk-chat-app"><u>MrMods</u></a></p>
+        </aside>
+      </footer>
     </div>
   );
 }

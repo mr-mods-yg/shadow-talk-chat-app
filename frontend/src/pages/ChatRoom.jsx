@@ -1,5 +1,5 @@
 import { socket } from '../lib/socket.js'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useUserStore } from "../store/useUserStore.js";
@@ -7,16 +7,25 @@ import { ChatInput } from '../components/ChatInput.jsx';
 import { RoomStatus } from '../components/RoomStatus.jsx';
 import { useMessageStore } from '../store/useMessageStore.js';
 import { ChatArea } from '../components/ChatArea.jsx';
+import BlinkingWatcher from '../components/BlinkingWatcher.jsx';
 
 function ChatRoom() {
   const { name, setId, setRoomId, setUsers, setSocket } = useUserStore();
   const { appendMessage, resetMessages } = useMessageStore();
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const params = useParams();
 
   useEffect(() => {
     socket.connect();
     setSocket(socket);
+    
+    // LOADING STATE MANAGEMENT
+    socket.on('connect', () => {
+      setLoading(false);
+    })
+    
+    // PARAM CHECK HANDLER
     if (!params.roomId) {
       // ROOMS NOT FOUND IN PARAMS -> CREATE ROOM
       if (name.trim() == "") {
@@ -63,17 +72,20 @@ function ChatRoom() {
       setSocket(null);
       resetMessages();
     }
-  }, [name, navigate, setId, setRoomId, setUsers, params.roomId, setSocket, appendMessage,resetMessages])
+  }, [name, navigate, setId, setRoomId, setUsers, params.roomId, setSocket, appendMessage, resetMessages])
 
-  
+  if (loading)
+    return <BlinkingWatcher/>
+
+
   // MAIN CHAT ROOM COMPONENT
   return (
     <>
       {/* ROOM STATUS */}
-      <RoomStatus/>
+      <RoomStatus />
 
       {/* CHAT AREA */}
-      <ChatArea/>
+      <ChatArea />
 
       {/* CHAT INPUT BOX AND TYPING INDICATOR */}
       <ChatInput />

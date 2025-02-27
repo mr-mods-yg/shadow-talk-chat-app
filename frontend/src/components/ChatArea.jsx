@@ -8,19 +8,41 @@ import { useUserStore } from "../store/useUserStore";
 export function ChatArea() {
   const { messages } = useMessageStore();
   const { socket } = useUserStore();
-  const messageContainer = useRef();
-  const parentMessageContainer = useRef();
+  const messageContainer = useRef(null);
+  const parentMessageContainer = useRef(null);
 
   // SMOOTH SCROLLING
   useEffect(() => {
-    if (parentMessageContainer.current) {
-      parentMessageContainer.current.scrollTo({
-        top: parentMessageContainer.current.scrollHeight,
+    if (!parentMessageContainer.current) return;
+  
+    const container = parentMessageContainer.current;
+    const images = container.querySelectorAll("img");
+  
+    const scrollToBottom = () => {
+      container.scrollTo({
+        top: container.scrollHeight,
         behavior: "smooth",
       });
+    };
+  
+    if (images.length === 0) {
+      scrollToBottom();
+    } else {
+      let loadedCount = 0;
+      images.forEach((img) => {
+        if (img.complete) {
+          loadedCount++;
+        } else {
+          img.onload = img.onerror = () => {
+            loadedCount++;
+            if (loadedCount === images.length) scrollToBottom();
+          };
+        }
+      });
+  
+      if (loadedCount === images.length) scrollToBottom();
     }
   }, [messages]); // Runs when messages update
-
 
   if (!socket) return <div>ERROR: SOCKET NOT FOUND!!!</div>
 

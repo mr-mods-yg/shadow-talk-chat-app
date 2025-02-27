@@ -59,7 +59,7 @@ function ChatRoom() {
 
     // SOCKER MSG RECIEVER
     socket.on('chatMessage', (msgObj) => {
-      appendMessage(msgObj)
+      appendMessage(msgObj);
     })
 
     // COMPONENT UNMOUNTED -> SOCKET DISCONNECTION 

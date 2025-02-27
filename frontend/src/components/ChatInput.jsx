@@ -31,6 +31,7 @@ export function ChatInput(){
 
     // MESSAGE SUBMIT HANDLER
     async function onSubmitHandler(e) {
+      console.log("message submit");
       e.preventDefault();
       const clientMessage = inputData.current.value;
       // if there is no image and text then do not send the message
@@ -38,6 +39,7 @@ export function ChatInput(){
       let hasImage = false;
       let imageObject = {};
       if(image){
+        console.log("message submit has an image attached");
         hasImage = true;
         const arrayBuffer = await image.arrayBuffer();
         const uint8Array = new Uint8Array(arrayBuffer);
@@ -89,8 +91,7 @@ export function ChatInput(){
 
     if(!socket) return <div className="">ERROR: SOCKET NOT FOUND!!</div>
 
-    return <form className='flex-col w-9/10 max-w-5xl items-center ' onSubmit={onSubmitHandler}>
-    {/* <textarea type="text" placeholder="Primary" className="textarea textarea-secondary w-full"></textarea> */}
+    return <form className='flex-col w-9/10 max-w-5xl items-center '>
     {image ? <div className='flex'>
               <img className='h-auto w-3/20 min-w-28'
                src={URL.createObjectURL(image)} />
@@ -98,8 +99,21 @@ export function ChatInput(){
              </div> : <></>}
     <TypingUserStatus users={users} />
     <div className='flex w-full h-12'>
-      <input ref={inputData} type="text" onChange={chatMessageChangeHandler} placeholder="Type here" className="input input-lg input-secondary flex-1" />
-      <button className="btn btn-secondary flex-0 h-full"><Send /></button>
+      <input ref={inputData} type="text" onChange={chatMessageChangeHandler} onKeyDown={(e)=>{
+        if(e.key==="Enter" && !e.shiftKey){
+          e.preventDefault();
+          onSubmitHandler(e);
+        }
+      }} onPaste={(e)=>{
+        const item = e.clipboardData.items[0];
+        if(item.type.startsWith("image/")){
+          setImage(item.getAsFile());
+        }
+      }} placeholder="Type here" className="input input-lg input-secondary flex-1" />
+      <button type="button" className="btn btn-secondary flex-0 h-full" onClick={(e)=>{
+        e.preventDefault();
+        onSubmitHandler(e);
+      }}><Send /></button>
       <button type="button" className="btn btn-secondary flex-0 h-full" onClick={imageUploadHandler}><Image /></button>
       <input className="hidden" ref={imageComponent} type="file" id="imageInput" accept="image/*" onChange={handleImageChange} />
     </div>

@@ -3,6 +3,7 @@ import { useUserStore } from "../store/useUserStore";
 import { TypingUserStatus } from "./TypingUserStatus";
 import { v4 as uuidv4 } from 'uuid';
 import { Image, Send, Trash2 } from "lucide-react";
+import { compressMessage } from "../lib/compression";
 
 export function ChatInput(){
     const {users, roomId, socket, setTypingUsers, name} = useUserStore();
@@ -49,9 +50,10 @@ export function ChatInput(){
           type: image.type      // MIME type (e.g., image/png)
         }
       }
+      const msgCompressed = compressMessage(clientMessage);
       // if server is connected then send the message to the server
       if (socket.connected) socket.emit('chatMessage', { 
-        id: uuidv4(), msg: clientMessage, name: name, 
+        id: uuidv4(), msg: msgCompressed, name: name, 
         senderId: socket.id, roomId: roomId, sentAt: new Date(),
         image: imageObject, hasImage: hasImage
       });

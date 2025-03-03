@@ -8,6 +8,7 @@ import { RoomStatus } from '../components/RoomStatus.jsx';
 import { useMessageStore } from '../store/useMessageStore.js';
 import { ChatArea } from '../components/ChatArea.jsx';
 import BlinkingWatcher from '../components/BlinkingWatcher.jsx';
+import { decompressMessage } from '../lib/compression.js';
 
 function ChatRoom() {
   const { name, setId, setRoomId, setUsers, setSocket } = useUserStore();
@@ -59,7 +60,8 @@ function ChatRoom() {
 
     // SOCKER MSG RECIEVER
     socket.on('chatMessage', (msgObj) => {
-      appendMessage(msgObj);
+      const decompressed = decompressMessage(msgObj.msg);
+      appendMessage({...msgObj, msg: decompressed});
     })
 
     // COMPONENT UNMOUNTED -> SOCKET DISCONNECTION 

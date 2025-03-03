@@ -15,7 +15,7 @@ export function ChatStart({name, msg, time, imageSrc, imageName}) {
       {name}
       <time className="text-xs opacity-50">{time}</time>
     </div>
-    <div className="chat-bubble">{msg}
+    <div className="chat-bubble break-words">{msg}
       {imageSrc!=="" ? <PhotoProvider><PhotoView src={imageSrc}><img className="max-w-42 w-full h-auto" src={imageSrc} alt={imageName}/></PhotoView></PhotoProvider> : <></>}
     </div>
     

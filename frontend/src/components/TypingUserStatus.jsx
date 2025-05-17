@@ -2,10 +2,11 @@ import { useUserStore } from "../store/useUserStore";
 
 // TYPING INDICATOR COMPONENT
 export function TypingUserStatus() {
-    const { users, typingUsers } = useUserStore();
+  const { users, typingUsers } = useUserStore();
+  if (typingUsers) {
     const currentTypingUsers = typingUsers.map((id) => users[id].name);
     const currentTypingUsersLength = currentTypingUsers.length;
-  
+
     if (currentTypingUsersLength == 1) {
       return <div>
         {currentTypingUsers} is typing...
@@ -31,3 +32,5 @@ export function TypingUserStatus() {
       return <></>
     }
   }
+
+}

@@ -1,16 +1,16 @@
 
 # Shadow Talk Chat Application
-Simple Room Based Chat Application
+Real-Time Room-Based Chat Application
 
-Features to expect: 
+Features : 
 
-- privacy features (encryption)
+- chat rooms
 
-- <strike>chat rooms</strike>
+- supports multiple themes [32 themes]
 
-- <strike>user avatars</strike>
-
-- sending files (<strike>images</strike>, etc.)
+- Functionality for sending images 
+  
+- Implemented message compression saving around 50-70% of traffic 
 
 
 ## Demo
